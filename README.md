@@ -5,12 +5,12 @@
 
 **<a href="https://github.com/sh25youn2">Seokhyun Youn</a>**<sup>1</sup>,
 **<a href="mailto:weeyoungkwon@cau.ac.kr">Weeyoung Kwon</a>**<sup>1</sup>,
-**Junho Kim**<sup>2</sup>,
+**<a href="https://www.junhokim-xyz.com/">Junho Kim</a>**<sup>2</sup>,
 **<a href="https://github.com/JihyongOh">Jihyong Oh</a>**<sup>1†</sup>
 <br>
 
 <sup>1</sup>Creative Vision and Multimedia Lab (CMLab), Chung-Ang University
-<sup>2</sup>Seoul National University
+<sup>2</sup>Cornell Tech
 <br>
 †Corresponding author
 
