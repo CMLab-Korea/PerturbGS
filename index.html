@@ -1,0 +1,1420 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>PerturbGS: Fast and Scalable Gaussian Splatting via Camera Perturbations</title><link rel="icon" type="image/png" href="assets/favicon.png"><style>@font-face{font-family:'Noto Sans';font-style:normal;font-weight:400;src:url(assets/fonts/NotoSans-400.woff2) format('woff2');font-display:swap}@font-face{font-family:'Noto Sans';font-style:normal;font-weight:700;src:url(assets/fonts/NotoSans-700.woff2) format('woff2');font-display:swap}/* Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+ */:root{--ink:#27301f;--muted:#4d5844;--accent:#875026;--mint:#08796e;--line:#dce6cf;--wash:#eff6e2;--paper:#fff;--sans:"Noto Sans","Segoe UI",Arial,sans-serif;font:16px/1.65 var(--sans);color:var(--ink)}*{box-sizing:border-box}body,h1,h2,h3,p,figure{margin:0}html{scroll-padding-top:70px}[hidden]{display:none!important}.wrap{width:min(1100px,calc(100% - 48px));margin-inline:auto}header{position:sticky;top:0;background:#fffffff5;border-bottom:1px solid var(--line);z-index:5}.nav,nav,.section-head,.result-controls,footer .wrap{display:flex;align-items:center;gap:22px}.nav,footer .wrap,.section-head{justify-content:space-between}.nav{min-height:54px}.brand{font-weight:760;letter-spacing:-.04em}.brand span,h1 span{color:var(--accent)}a{color:inherit}nav a,.brand{text-decoration:none}nav a{font-size:.89rem}.skip{position:fixed;top:-100px;background:white;z-index:8}.skip:focus{top:0}a:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #699439;outline-offset:3px}.mast{text-align:center;background:radial-gradient(ellipse at 50% -24%,#deedcb,transparent 74%);padding:45px 0 30px}.eyebrow,.section-head>span{font-size:.75rem;letter-spacing:.12em;font-weight:750;text-transform:uppercase;color:var(--mint)}h1{font:760 clamp(4rem,8vw,6.6rem)/1 var(--sans);letter-spacing:-.075em;margin:10px 0}.subtitle{font:clamp(1.45rem,3vw,2.25rem)/1.24 var(--sans)}.tldr,.intro{max-width:760px;color:var(--muted)}.tldr{margin:18px auto 0}.tldr b{color:var(--accent);margin-right:6px}h2{font:700 clamp(1.9rem,4vw,2.8rem)/1.12 var(--sans);letter-spacing:-.035em}.section-head h2{font-size:clamp(1.45rem,3vw,2rem)}.section-head{margin-bottom:12px}.film-section{padding:14px 0 0}.player,.abstract,.paper-figure figure,.table-wrap,.results-fig{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:white}.player video{display:block;width:100%;height:auto;aspect-ratio:1280/684;background:#f6f9ef}.tabs,.figure-step-controls,.figure-step-heading{display:flex;flex-wrap:wrap;gap:7px}.caption,figcaption{color:var(--muted);font-size:.91rem;margin-top:9px}.abstract{margin:32px auto;padding:15px 20px;max-width:850px}.abstract summary{font:600 1.3rem var(--sans);cursor:pointer}.abstract p{margin-top:12px}.section-title{font-size:2rem;margin:30px 0 15px}.cards,.region-notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:10px}.cards article,.region-note{padding:16px;background:#fff;border:1px solid var(--line);border-radius:9px}.cards h3{font-size:1.06rem;color:var(--accent);margin-bottom:5px}.cards p,.region-note span{color:var(--muted);font-size:.95rem}.tinted,.section{padding:50px 0}.tinted{margin-top:44px;background:var(--wash)}.intro{margin:12px 0 20px}button,select{font:600 .88rem var(--sans);border:1px solid #cbd9b9;color:var(--ink);background:white;border-radius:6px;padding:8px 11px;cursor:pointer}button:hover{border-color:var(--accent)}button[aria-pressed=true],button[aria-current=step]{background:#e3efcf;color:var(--ink);border-color:#86a761}.paper-figure{margin-top:12px}.paper-figure figcaption,.results-fig figcaption{padding:10px 14px;margin:0;border-top:1px solid var(--line)}.enlarge-paper{margin-left:6px}.figure-surface{position:relative;line-height:0}.figure-surface>img,.results-fig img{display:block;width:100%}.figure-hit{position:absolute;cursor:zoom-in}.figure-surface.isolated .figure-hit{display:none}.figure-surface.isolated>img{display:none}.figure-surface>svg{display:block;width:100%;height:auto;max-height:65vh}.figure-steps{border-top:1px solid var(--line);padding:12px}.figure-step-heading{align-items:center;justify-content:space-between;margin-bottom:8px}.region-notes{margin-top:10px}.region-note{text-align:left;background:white}.region-note b,.region-note span{display:block}.region-note span{margin-top:5px;line-height:1.45;font-weight:400}.region-note[aria-pressed=true]{background:#f1f7e6;color:var(--ink);border-color:var(--accent)}.walkthrough-base{opacity:.3}.step-light{opacity:0}.step-light.lit,.walkthrough-complete .walkthrough-base{opacity:1}.step-light,.walkthrough-base{transition:opacity .4s}.result-controls{gap:14px;flex-wrap:wrap;margin-bottom:12px}select{margin-left:4px}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.95rem}caption{text-align:left;padding:12px 14px;font-weight:650}td,th{border-top:1px solid var(--line);padding:9px 14px;text-align:right;white-space:nowrap}th:first-child{text-align:left}thead{background:#f3f8e9}tbody tr:last-child{background:#e5f0d3}.results-fig{margin-top:24px}footer{border-top:1px solid var(--line);padding:20px 0;font-size:.9rem}dialog{width:min(95vw,1650px);padding:12px;border:1px solid var(--line);border-radius:10px}dialog::backdrop{background:#101c31ca}dialog img{display:block;width:100%}dialog button{float:right;margin:0 0 8px}@media(max-width:650px){.wrap{width:calc(100% - 28px)}.cards{grid-template-columns:1fr}.region-notes{grid-template-columns:1fr 1fr}.region-note{padding:10px}.region-note span{font-size:.86rem}.mast{padding-top:30px}nav{gap:13px}td,th{padding:7px}.figure-surface>svg{max-height:none}}@media(prefers-reduced-motion:reduce){.step-light,.walkthrough-base{transition:none}}
+
+.film-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 10px;
+}
+.film-caption .caption { margin: 0; }
+.film-caption button { flex-shrink: 0; }
+.figure-step-heading strong { margin-right: auto; }
+@media (max-width: 650px) {
+  .film-caption { align-items: flex-start; flex-direction: column; gap: 7px; }
+}
+.tldr strong { color: #82452e; }
+.region-notes { margin: 0 0 12px; }
+.region-note, .cards article {
+  display: grid;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  align-items: start;
+}
+.region-note { grid-row: span 3; }
+.cards article { grid-row: span 2; }
+.region-note b, .cards h3 { overflow-wrap: break-word; }
+.source { color: var(--mint); font-size: .88rem; font-weight: 700; margin-bottom: 3px; }
+.result-finding { max-width: 78ch; margin-top: 16px; }
+.table-wrap small { color: var(--muted); font-weight: 500; }
+
+
+@media(max-width:650px) {
+  
+  .figure-step-heading strong { flex-basis: 100%; }
+}
+.brand { display:inline-flex; align-items:center; }
+.brand img { object-fit:contain; margin-right:4px; }
+.mast-icon { display:block; height:176px; }
+.mast-icon img { width:196px; height:176px; object-fit:contain; }
+
+.parallax-card { padding:20px; background:#fff; border:1px solid var(--line); border-radius:12px; }
+.projection-pair { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.projection-pair>div { background:white; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+.projection-pair h3 { font-size:.96rem; padding:10px 14px 0; }
+.projection-pair canvas { display:block; width:100%; height:auto; }
+.depth-heading { display:flex; align-items:baseline; justify-content:space-between; gap:6px; padding-right:12px; }
+.depth-heading > span { font-size:.76rem; font-weight:650; color:var(--muted); }
+#filter-state[data-stage="conflict"] { color:#99441f; }
+#filter-state[data-stage="filtered"] { color:#08796e; }
+.point-key { display:flex; gap:18px; margin:12px 0 20px; font-size:.87rem; }
+.point-key span::before { content:""; display:inline-block; width:.72em; height:.58em; border-radius:50%; margin-right:5px; background:var(--mint); }
+.point-key span+span::before { background:#b45630; }
+.parallax-card label { font-weight:650; display:flex; justify-content:space-between; }
+.parallax-card input { width:100%; accent-color:var(--accent); }
+#parallax { border-bottom:1px solid var(--line); }
+@media(max-width:650px) {
+  
+  .projection-pair { grid-template-columns:1fr; }
+  .brand img { display:none; }
+  .nav { gap:8px; }
+}
+
+body { background:#f8fbf2; }
+.player,.abstract,.cards article,.paper-figure figure,.table-wrap,.parallax-card {
+  box-shadow:0 2px 5px #4753300a,0 7px 20px #4753300c;
+}
+.section-head h2::after { content:""; display:block; width:66px; height:3px; margin-top:14px; background:var(--accent); }
+.eyebrow { color:var(--accent); }
+nav a[aria-current="location"] { font-weight:700; color:var(--accent); }
+@media(min-width:1100px) {
+  header { position:fixed; inset:0 auto 0 0; width:210px; border:0; border-right:1px solid var(--line); background:linear-gradient(165deg,#fff,#f1f6e8); }
+  .nav { width:100%; padding:35px 20px; flex-direction:column; align-items:stretch; gap:38px; }
+  .brand { font-size:1.2rem; }
+  .brand img { width:53px; height:43px; }
+  nav { flex-direction:column; align-items:stretch; gap:6px; border-left:3px solid var(--line); padding-left:10px; }
+  nav a { padding:9px 13px; border:1px solid transparent; border-radius:8px; }
+  nav a[aria-current="location"],nav a:hover { border-color:var(--line); background:#fff; }
+  main,footer { margin-left:210px; }
+}
+
+.example-picker { display:inline-flex; flex-wrap:wrap; gap:4px; padding:4px; margin:18px 0 14px; max-width:100%; border:1px solid var(--line); border-radius:10px; background:white; }
+.example-picker label { position:relative; cursor:pointer; }
+.example-picker input,.skip-label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.example-picker span { display:block; border-radius:6px; padding:6px 12px; color:var(--muted); font-size:.9rem; font-weight:650; }
+.example-picker input:checked + span { color:var(--ink); background:#e3efcf; box-shadow:inset 0 -2px var(--accent); }
+.example-picker input:focus-visible + span { outline:2px solid var(--mint); outline-offset:1px; }
+.group-control { margin-top:16px; }
+
+.group-steps { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+.group-members { margin-top:8px; font-size:clamp(.76rem,1.1vw,.9rem); }
+.group-members th,.group-members td { padding:4px 8px; text-align:left; color:var(--muted); }
+.group-members thead th { white-space:normal; line-height:1.25; }
+@media(max-width:480px) {
+  .group-members th,.group-members td { padding:4px; }
+}
+.group-members tbody tr { background:white; }
+.group-members tr.match { background:#eaf4e7; }
+.group-members td.difference { color:#934824; font-weight:700; }
+.group-members tr.match th { color:#08796e; }
+#group-figure-title { min-height:2em; }
+
+.cpi-viewer { background:#fff; }
+.cpi-viewer video { display:block; width:100%; max-height:60vh; aspect-ratio:604/386; background:white; }
+.cpi-meta { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:8px 14px; }
+#cpi-current { color:var(--mint); font-weight:650; }
+
+.region-reference { display:block; margin-bottom:4px; color:var(--mint); font-size:.78rem; font-weight:650; }
+
+.comparison-player { padding:16px; background:white; border:1px solid var(--line); border-radius:12px; }
+.comparison-options,.comparison-transport { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.comparison-options { justify-content:space-between; margin-bottom:14px; }
+.comparison-options label { font-size:.92rem; font-weight:650; }
+.comparison-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+#comparison-scene { margin:10px 0 8px; font-size:1rem; }
+.comparison-heading,.comparison-clock { display:flex; align-items:center; gap:12px; }
+.comparison-heading { justify-content:space-between; flex-wrap:wrap; margin-bottom:12px; }
+.comparison-clock { font-variant-numeric:tabular-nums; line-height:1.2; }
+.comparison-clock small,.comparison-clock strong { display:block; }
+.comparison-clock small { color:var(--muted); }
+.comparison-clock strong { font-size:1.45rem; }
+.comparison-clock b { color:var(--accent); }
+.clock-face { position:relative; width:40px; height:40px; border:2px solid var(--ink); border-radius:50%; background:radial-gradient(circle,var(--ink) 0 2px,transparent 3px),radial-gradient(circle,white 61%,transparent 62%),repeating-conic-gradient(var(--muted) 0 2deg,white 2deg 30deg); }
+.clock-face::before,.clock-face::after { content:""; position:absolute; bottom:50%; left:50%; transform-origin:bottom center; }
+.clock-face::before { height:29%; width:3px; margin-left:-1.5px; background:var(--ink); transform:rotate(var(--minutes)); }
+.clock-face::after { height:42%; width:2px; margin-left:-1px; background:var(--accent); transform:rotate(var(--seconds)); }
+.comparison-grid figure { border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+.comparison-grid figure:first-child { border-color:#94b476; }
+.comparison-grid figcaption { margin:0; padding:6px 10px; font-weight:700; }
+.comparison-grid figure:first-child figcaption { background:#f1f7e6; color:#496824; }
+.comparison-grid canvas { display:block; width:100%; height:auto; background:#f3f5ee; }
+.comparison-grid figure { position:relative; }
+.comparison-grid figcaption { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px 12px; }
+.recon-time { display:inline-flex; align-items:center; gap:6px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.recon-time i { position:relative; width:1.1em; height:1.1em; border:1.5px solid currentColor; border-radius:50%; }
+.recon-time i::after { content:""; position:absolute; bottom:50%; left:50%; width:1px; height:39%; background:currentColor; transform-origin:bottom; transform:rotate(var(--hand)); }
+.comparison-grid .reconstructing canvas { opacity:.12; }
+.comparison-grid .reconstructing::after { content:"Reconstructing…"; position:absolute; left:50%; top:54%; transform:translate(-50%,-50%); font-weight:650; color:var(--ink); }
+.comparison-transport { margin-top:12px; }
+.comparison-transport input { flex:1; min-width:55px; accent-color:var(--mint); }
+.comparison-transport output { font-size:.88rem; font-variant-numeric:tabular-nums; }
+@media(max-width:650px) {
+  .nav nav { min-width:0; overflow-x:auto; }
+  .comparison-player { padding:10px; }
+  .comparison-grid { grid-template-columns:1fr; gap:8px; }
+  .comparison-options select { max-width:100%; }
+}
+
+.parallax-transport { display:flex; align-items:center; gap:12px; margin-top:4px; }
+.parallax-transport button { min-width:5em; }
+.parallax-transport input { flex:1; min-width:0; }
+</style><style>.authors{margin:18px auto 0;font-size:1.08rem}.affiliations{margin:6px auto 0;font-size:.92rem;color:var(--muted)}.authors sup,.affiliations sup{font-size:.7em}</style></head><body>
+<a class="skip" href="#main">Skip to content</a>
+<header><div class="wrap nav"><a class="brand" href="#main"><img src="assets/favicon.png" alt="" width="38" height="30">Perturb<span>GS</span></a><nav aria-label="Sections"><a href="#demo">Demo</a><a href="#comparisons">Comparisons</a><a href="#method">Method</a><a href="#parallax">Parallax</a><a href="#results">Results</a></nav></div></header>
+<main id="main">
+<section class="mast"><div class="wrap"><picture class="mast-icon"><source media="(prefers-reduced-motion: reduce)" srcset="assets/mast-icon-still.png"><img src="assets/mast-icon.webp" width="196" height="176" alt="Points form the same flower in five separate reconstructions using 12, 24, 48, 96, and 192 input views"></picture><h1>Perturb<span>GS</span></h1><p class="subtitle">Fast and Scalable Gaussian Splatting<br> via Camera Perturbations</p><p class="authors">Seokhyun Youn<sup>1</sup>, Weeyoung Kwon<sup>1</sup>, Junho Kim<sup>2</sup>, Jihyong Oh<sup>1,&dagger;</sup></p><p class="affiliations"><sup>1</sup>CMLab, Chung-Ang University &nbsp; <sup>2</sup>Seoul National University &nbsp; <sup>&dagger;</sup>Corresponding author</p>
+<p class="tldr">PerturbGS is a <strong>view-count-agnostic</strong> framework for <strong>fast and scalable</strong> 3D Gaussian Splatting reconstruction from sparse or dense sets of unposed views. It uses camera perturbations to resolve <strong>geometric ambiguity</strong> before and during 3DGS training.</p></div></section>
+<section class="wrap film-section" id="demo"><div class="section-head"><h2>How camera perturbations guide reconstruction</h2></div>
+<div class="player"><video id="film" controls playsinline preload="metadata" poster="assets/film-poster.webp" aria-label="Continuous visual walkthrough of CPI and CPA using the paper’s figures" src="assets/film.mp4"></video></div>
+<div class="film-caption"><div><p class="source" id="film-source"></p><p class="caption">Compare 3D-VFM initialization and 3DGS training acceleration. Follow CPI before 3DGS training and CPA during 3DGS training. Compare a held-out view of Kitchen reconstructed from 12 input views, then inspect the toy wheels in Supplementary Fig. 8. At 192 views, the clock shows mean reconstruction time over nine scenes alongside renderings of Flowers.</p></div><button id="inspect-frame" type="button">Explore this figure</button></div></section>
+<section class="wrap"><details class="abstract"><summary>Abstract</summary><p>Fast and scalable 3D Gaussian Splatting (3DGS) reconstruction from unposed input views requires both computational efficiency and geometric reliability. With dense views, Structure-from-Motion (SfM) preprocessing dominates the total reconstruction time, and initializing Gaussians from the pixel-wise predictions of a 3D vision foundation model (3D-VFM) can exhaust GPU memory. With sparse views, wide baselines can cause SfM registration to fail, and pose and depth errors in the predictions of the 3D-VFM can introduce artifacts in novel views. We propose PerturbGS, a view-count-agnostic framework for fast and scalable 3DGS reconstruction from both dense and sparse views. Our key insight is to use camera perturbations to expose geometric ambiguity before and during 3DGS training. Before 3DGS training, our Camera-Perturbation-based Initialization (CPI) identifies depth-inconsistent point clouds through camera perturbations and removes them along with duplicate point clouds, yielding a compact initialization for 3DGS training. During 3DGS training, our Camera-Perturbation-based Adaptive density control (CPA) prunes Gaussians with low rendering contribution across input and perturbed views. Through camera perturbations, our CPA also groups Gaussians and densifies them group-wise, which limits the redundant growth of Gaussians. Our PerturbGS reconstructs 3D scenes from dense views where previous methods exhaust GPU memory and produces sharper novel views with reduced artifacts from sparse views.</p></details>
+<h2 class="section-title">Key contributions</h2><div class="cards"><article><h3>View-count-agnostic reconstruction</h3><p>PerturbGS uses the same camera-perturbation framework to reconstruct scenes from sparse to dense sets of unposed views. It reconstructs every evaluated scene on Mip-NeRF 360 and Deep Blending with 12 to 192 input views.</p></article><article><h3>Camera-Perturbation-based Initialization (CPI)</h3><p>CPI tests camera rigidity, removes depth-inconsistent points, and fuses repeated observations into a compact initial cloud.</p></article><article><h3>Camera-Perturbation-based Adaptive density control (CPA)</h3><p>CPA prunes Gaussians with low rendering contribution and gives candidates with similar projected displacements a shared growth budget.</p></article></div></section>
+<section class="wrap section" id="comparisons">
+<p class="source">Mip-NeRF 360 and Deep Blending · Main paper, Table 2</p>
+<h2>Reconstruction from 12 to 192 input views</h2>
+<p class="intro">Each comparison opens with the mean reconstruction times from Table 2, then plays the same 10-second camera path for both methods. Switch baselines at any frame.</p>
+<div class="comparison-player">
+<div class="comparison-options"><div class="tabs" id="comparison-views" role="group" aria-label="Input view count"></div>
+<label for="comparison-method">Compare with <select id="comparison-method"></select></label></div>
+<div class="comparison-heading">
+<h3 id="comparison-scene"></h3>
+<div class="comparison-clock"><i class="clock-face" aria-hidden="true"></i><div><small>Reconstruction clock</small><strong id="comparison-elapsed" role="timer">0:00</strong></div><b id="comparison-speed"></b></div>
+</div>
+<div class="comparison-grid">
+<figure><figcaption><span>PerturbGS (Ours)</span><span class="recon-time"><i aria-hidden="true"></i><span></span></span></figcaption><canvas id="comparison-ours" aria-label="PerturbGS reconstruction"></canvas></figure>
+<figure><figcaption><span id="comparison-baseline-label"></span><span class="recon-time"><i aria-hidden="true"></i><span></span></span></figcaption><canvas id="comparison-baseline" aria-labelledby="comparison-baseline-label"></canvas></figure></div>
+<div class="comparison-transport"><button id="comparison-play" type="button">Play</button>
+<input type="range" id="comparison-seek" min="0" max="0" value="0" aria-label="Comparison video frame">
+<output id="comparison-time" for="comparison-seek"></output>
+<button id="comparison-still" type="button" aria-pressed="false">Inspect source frame · 0:05</button></div>
+<p class="caption">Clocks show the mean total reconstruction time for the selected dataset and view count (Table 2).</p>
+<video id="comparison-video" muted playsinline preload="auto" hidden></video>
+<template id="comparison-12"><source src="assets/comparison-12.mp4"><img src="assets/comparison-12.webp" alt=""></template><template id="comparison-24"><source src="assets/comparison-24.mp4"><img src="assets/comparison-24.webp" alt=""></template><template id="comparison-48"><source src="assets/comparison-48.mp4"><img src="assets/comparison-48.webp" alt=""></template><template id="comparison-96"><source src="assets/comparison-96.mp4"><img src="assets/comparison-96.webp" alt=""></template><template id="comparison-192"><source src="assets/comparison-192.mp4"><img src="assets/comparison-192.webp" alt=""></template></div></section>
+<section class="tinted" id="method"><div class="wrap"><p class="eyebrow">Method</p><h2>Before and during 3DGS training</h2>
+<p class="intro">Start with camera poses and depths predicted by DA3. CPI turns these predictions into the initial point cloud. CPA then prunes, splits, and clones Gaussians during 3DGS training.</p>
+<div class="tabs" aria-label="Paper figures"><button data-figure="teaser" aria-controls="teaser" aria-pressed="true">Fig. 1 · Reconstruction trade-offs</button><button data-figure="ambiguity" aria-controls="ambiguity" aria-pressed="false">Fig. 2 · Geometric ambiguity</button><button data-figure="pipeline" aria-controls="pipeline" aria-pressed="false">Fig. 3 · Method overview</button><button data-figure="cloud" aria-controls="cloud" aria-pressed="false">Fig. 4 · CPI point cloud</button></div>
+<p class="caption" id="figure-hint">Select a region of the figure or its description to enlarge it and follow the steps.</p>
+<div class="paper-figure" id="teaser"><div class="region-notes"><button class="region-note" data-reference="Main paper · Fig. 1(i)" data-box="35.9,0,31.1,100" data-chapter="3" aria-pressed="false"><small class="region-reference">Fig. 1(i)</small><b>Dense views</b><span>Compare initialization, accelerated training, and PerturbGS.</span></button><button class="region-note" data-reference="Main paper · Fig. 1(ii)" data-box="67.7,0,31.9,100" data-chapter="0" aria-pressed="false"><small class="region-reference">Fig. 1(ii)</small><b>Sparse views</b><span>Pose and depth errors become visible around the bicycle.</span></button></div><figure><div class="figure-image"><div class="figure-surface"><img alt="Reconstruction trade-offs" src="assets/fig1.webp"></div></div><figcaption><b>Main paper · Fig. 1</b> · Dense inputs stress memory and preprocessing time. Sparse inputs stress geometric reliability. <button class="enlarge-paper">Enlarge figure</button></figcaption></figure></div><div class="paper-figure" id="ambiguity" hidden><div class="region-notes"><button class="region-note" data-reference="Main paper · Fig. 2(a)" data-box="1.4,20,97,40" data-chapter="1" aria-pressed="false"><small class="region-reference">Fig. 2(a)</small><b>Pose error</b><span>Examine the bicycle frame from a novel view.</span></button><button class="region-note" data-reference="Main paper · Fig. 2(b)" data-box="1.4,61,97,38" data-chapter="2" aria-pressed="false"><small class="region-reference">Fig. 2(b)</small><b>Depth error</b><span>Compare the projected surface with the enlarged novel-view crop.</span></button></div><figure><div class="figure-image"><div class="figure-surface"><img alt="Geometric ambiguity" src="assets/fig2.webp"></div></div><figcaption><b>Main paper · Fig. 2</b> · An erroneous pose or depth can agree with the input image while producing artifacts in a novel view. <button class="enlarge-paper">Enlarge figure</button></figcaption></figure></div><div class="paper-figure" id="pipeline" hidden><div class="region-notes"><button class="region-note" data-reference="Main paper · Fig. 3(a) (Alg. 1, lines 1–8)" data-box="0.0,7.584269662921348,42.44897959183673,41.57303370786517" data-chapter="5" aria-pressed="false"><small class="region-reference">Fig. 3(a) (Alg. 1, lines 1–8)</small><b>Rigidity-gated refinement</b><span>The bearing-rigidity test determines whether CPI refines the predicted cameras and track-supported depths.</span></button><button class="region-note" data-reference="Main paper · Fig. 3(b) (Alg. 1, lines 9–11)" data-box="42.755102040816325,7.584269662921348,32.857142857142854,41.57303370786517" data-chapter="6" aria-pressed="false"><small class="region-reference">Fig. 3(b) (Alg. 1, lines 9–11)</small><b>Camera-perturbation-based filtering</b><span>Perturbed cameras expose off-surface points. Depth agreement across views determines which points to retain.</span></button><button class="region-note" data-reference="Main paper · Fig. 3(c) (Alg. 1, lines 12–15)" data-box="75.91836734693878,7.584269662921348,24.081632653061224,41.57303370786517" data-chapter="7" aria-pressed="false"><small class="region-reference">Fig. 3(c) (Alg. 1, lines 12–15)</small><b>Visibility-based consolidation</b><span>CPI fuses repeated observations and fills gaps with retained pixels.</span></button><button class="region-note" data-reference="Main paper · Fig. 3(d)" data-box="0.0,57.86516853932584,24.183673469387756,42.13483146067416" data-chapter="8" aria-pressed="false"><small class="region-reference">Fig. 3(d)</small><b>Contribution-based pruning</b><span>CPA ranks Gaussians by their total rendering contribution in input and perturbed views.</span></button><button class="region-note" data-reference="Main paper · Fig. 3(e)" data-box="24.489795918367346,57.86516853932584,60.204081632653065,42.13483146067416" data-chapter="9" aria-pressed="false"><small class="region-reference">Fig. 3(e)</small><b>Group-wise densification</b><span>Within the same view and image tile, candidates with similar projected shifts share a densification budget.</span></button></div><figure><div class="figure-image"><div class="figure-surface"><img alt="Method overview" src="assets/fig3.webp"></div></div><figcaption><b>Main paper · Fig. 3</b> · CPI builds the point cloud before 3DGS training. CPA controls the Gaussian population during 3DGS training. <button class="enlarge-paper">Enlarge figure</button></figcaption></figure></div><div class="paper-figure" id="cloud" hidden><div class="region-notes"><button class="region-note" data-reference="Main paper · Fig. 4 (Alg. 1 input)" data-box="0,0,47.5,49" data-chapter="4" aria-pressed="false"><small class="region-reference">Fig. 4 (Alg. 1 input)</small><b>Original point cloud</b><span>Back-projected 3D-VFM predictions.</span></button><button class="region-note" data-reference="Main paper · Fig. 4(a) (Alg. 1, lines 1–8)" data-box="52.5,0,47.5,49" data-chapter="5" aria-pressed="false"><small class="region-reference">Fig. 4(a) (Alg. 1, lines 1–8)</small><b>Rigidity-gated refinement</b><span>When the bearing-rigidity test passes, the predicted camera poses move to their refined positions.</span></button><button class="region-note" data-reference="Main paper · Fig. 4(b) (Alg. 1, lines 9–11)" data-box="0,50,47.5,50" data-chapter="6" aria-pressed="false"><small class="region-reference">Fig. 4(b) (Alg. 1, lines 9–11)</small><b>Camera-perturbation-based filtering</b><span>The surface becomes visible as depth-inconsistent points are removed.</span></button><button class="region-note" data-reference="Main paper · Fig. 4(c) (Alg. 1, lines 12–15)" data-box="52.5,50,47.5,50" data-chapter="7" aria-pressed="false"><small class="region-reference">Fig. 4(c) (Alg. 1, lines 12–15)</small><b>Visibility-based consolidation</b><span>Repeated observations are fused into a compact cloud.</span></button></div><figure><div class="cpi-viewer"><video id="cpi-clip" controls muted playsinline preload="metadata" aria-label="Four stages of CPI in Figure 4" src="assets/cpi-clip.mp4"></video><div class="cpi-meta"><p id="cpi-current"></p><button type="button" class="cpi-watch">Watch in film</button></div></div><div hidden><img alt="CPI point cloud" src="assets/cpi-point-cloud.webp"></div><figcaption><b>Main paper · Fig. 4</b> · The paper’s point-cloud example progresses from 26.13M input points to 24.50M after filtering and 2.37M after consolidation. <button class="enlarge-paper">Enlarge figure</button></figcaption></figure></div></div></section>
+<section class="wrap section" id="parallax"><h2>Parallax in PerturbGS</h2>
+<fieldset class="example-picker"><legend class="skip-label">Choose a parallax example</legend>
+<label><input type="radio" name="parallax-example" aria-controls="depth-example" checked><span>Camera-perturbation-based filtering</span></label>
+<label><input type="radio" name="parallax-example" aria-controls="group-example"><span>Group-wise densification</span></label></fieldset>
+<div id="depth-example"><p class="source">Main paper · Fig. 2(b) · Fig. 3(b) · Algorithm 1</p>
+
+<p class="intro">Move the camera from the input view to the perturbed view. Watch the depth map as CPI checks the two points and filters the point in front of the surface.</p>
+<div class="parallax-card"><div class="projection-pair"><div><div class="depth-heading"><h3>Camera and scene</h3><span>Top view · fixed field of view</span></div><canvas id="ray-view" width="640" height="230" aria-label="Top view of a translating camera and two points at different depths"></canvas></div><div><div class="depth-heading"><h3>Point-cloud depth</h3><span id="filter-state" role="status">Input view</span></div><canvas id="depth-view" width="640" height="230" aria-label="Schematic depth map. Darker values are nearer to the camera."></canvas></div></div>
+<div class="point-key"><span>Surface point</span><span>Off-surface point</span></div>
+<label for="camera-offset">Camera shift <output id="shift-value" for="camera-offset"></output></label>
+<div class="parallax-transport"><button type="button" id="depth-play" aria-controls="ray-view depth-view">Play</button><input type="range" min="0" max="100" value="0" id="camera-offset" aria-describedby="parallax-note"></div>
+<p class="caption" id="parallax-note"></p></div></div>
+<div id="group-example" hidden><p class="source">Main paper · Fig. 3(e) · Fig. 7(b)</p>
+<p class="intro">Follow Gaussian A from its input view to its densification group. Within the same input view and tile, Gaussians with similar projected shifts share a densification budget. The method groups shifts by their whole-pixel part.</p>
+<div class="parallax-card"><div class="group-steps" role="group" aria-label="Group formation steps"><button type="button" value="0">Assign view</button><button type="button" value="25">Locate tile</button><button type="button" value="65">Measure shift</button><button type="button" value="75">Form group</button><button type="button" value="100">Apply budget</button></div>
+<div class="projection-pair"><div><h3 id="group-figure-title">Contribution by input view</h3><canvas id="tile-displacement" width="640" height="265" aria-labelledby="group-figure-title" aria-describedby="group-note"></canvas></div>
+<div><h3>Which Gaussians match A?</h3><table class="group-members"><thead><tr><th>Gaussian</th><th>View</th><th>Tile</th><th>Projected shift</th><th>Group</th></tr></thead><tbody id="group-members"></tbody></table></div></div>
+<label class="group-control" for="group-progress">Densification step <output id="group-stage" for="group-progress"></output></label>
+<div class="parallax-transport"><button type="button" id="group-play" aria-controls="tile-displacement group-members">Play</button><input type="range" min="0" max="100" value="0" id="group-progress" aria-describedby="group-note"></div>
+<p class="caption" id="group-note"></p></div></div></section>
+<section class="wrap section" id="results"><p class="eyebrow">Results</p><h2>Reconstruction across view counts</h2>
+<p class="intro">On Mip-NeRF 360, PerturbGS reconstructs the scene in 1.8 minutes on average with 12 input views and 3.0 minutes with 192. Times include preprocessing and training on one NVIDIA RTX 5090.</p>
+<div class="result-controls"><label>Dataset <select id="dataset"><option>Mip-NeRF 360</option><option>Deep Blending</option></select></label><label>Input views <select id="views"><option>12</option><option>24</option><option>48</option><option>96</option><option>192</option></select></label></div>
+<div class="table-wrap"><table><caption id="result-caption"></caption><thead><tr><th>Method</th><th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th><th>Time (min) ↓</th></tr></thead><tbody id="metrics"></tbody></table></div>
+<p class="caption">Rows (e)–(h) are the SfM-free methods ranked in Table 2. <strong>Bold</strong> marks the best quality score and <u>underline</u> the second best. OOM indicates an out-of-memory error. A fraction beside a method gives the number of scored scenes out of the dataset total.</p>
+<p class="result-finding" id="result-finding"></p>
+</section></main><footer><div class="wrap"><p>PerturbGS: Fast and Scalable Gaussian Splatting via Camera Perturbations</p><a href="#main">Back to top ↑</a></div></footer>
+<dialog id="dialog"><button id="close" aria-label="Close full figure">Close</button><img alt=""></dialog>
+<script>const reconstructionClockSpeed=250; const comparisonClips=[{"views": 12, "dataset": "Mip-NeRF 360", "scene": "Room", "width": 388, "height": 258, "columns": 3, "fps": 30.0, "methods": ["PerturbGS (Ours)", "VGGT-X \u00b7 arXiv'25", "FastGS (COLMAP) \u00b7 CVPR'26", "SAD-GS (COLMAP) \u00b7 SIGGRAPH'26", "InstantSplat \u00b7 arXiv'24"], "minutes": ["1.8", "7.2", "1.6", "0.8", "0.9"]}, {"views": 24, "dataset": "Deep Blending", "scene": "Playroom", "width": 1264, "height": 832, "columns": 3, "fps": 30.0, "methods": ["PerturbGS (Ours)", "VGGT-X \u00b7 arXiv'25", "FastGS (COLMAP) \u00b7 CVPR'26", "SAD-GS (COLMAP) \u00b7 SIGGRAPH'26", "AirSplat \u00b7 ECCV'26", "InstantSplat \u00b7 arXiv'24"], "minutes": ["2.8", "9.1", "1.4", "0.7", "<0.1", "2.5"]}, {"views": 48, "dataset": "Deep Blending", "scene": "Dr. Johnson", "width": 1332, "height": 876, "columns": 3, "fps": 30.0, "methods": ["PerturbGS (Ours)", "VGGT-X \u00b7 arXiv'25", "FastGS (COLMAP) \u00b7 CVPR'26", "SAD-GS (COLMAP) \u00b7 SIGGRAPH'26", "AirSplat \u00b7 ECCV'26"], "minutes": ["2.9", "11.3", "2.0", "1.2", "<0.1"]}, {"views": 96, "dataset": "Mip-NeRF 360", "scene": "Garden", "width": 648, "height": 420, "columns": 3, "fps": 30.0, "methods": ["PerturbGS (Ours)", "VGGT-X \u00b7 arXiv'25", "FastGS (COLMAP) \u00b7 CVPR'26", "FastGS (GLOMAP) \u00b7 CVPR'26", "SAD-GS (COLMAP) \u00b7 SIGGRAPH'26", "SAD-GS (GLOMAP) \u00b7 SIGGRAPH'26"], "minutes": ["2.4", "9.8", "8.0", "4.3", "7.1", "3.6"]}, {"views": 192, "dataset": "Mip-NeRF 360", "scene": "Flowers", "width": 628, "height": 414, "columns": 3, "fps": 30.0, "methods": ["PerturbGS (Ours)", "VGGT-X \u00b7 arXiv'25", "FastGS (COLMAP) \u00b7 CVPR'26", "FastGS (GLOMAP) \u00b7 CVPR'26", "SAD-GS (COLMAP) \u00b7 SIGGRAPH'26", "SAD-GS (GLOMAP) \u00b7 SIGGRAPH'26"], "minutes": ["3.0", "10.0", "18.2", "8.4", "17.1", "7.5"]}]; const chapters=[{"start": 2, "reference": "Main paper, Fig. 1", "panel": "teaser", "region": 1}, {"start": 8, "reference": "Main paper, Fig. 2(a)", "panel": "ambiguity", "region": 0}, {"start": 12, "reference": "Main paper, Fig. 2(b)", "panel": "ambiguity", "region": 1}, {"start": 16, "reference": "Main paper, Sec. 1, Fig. 1", "panel": "teaser", "region": 0}, {"start": 20, "reference": "Main paper, Fig. 4", "panel": "cloud", "region": 0}, {"start": 24, "reference": "Main paper, Figs. 3(a), 4(a), Algorithm 1", "panel": "cloud", "region": 1}, {"start": 29, "reference": "Main paper, Figs. 3(b), 4(b), Algorithm 1", "panel": "cloud", "region": 2}, {"start": 32, "reference": "Main paper, Figs. 3(c), 4(c), Algorithm 1", "panel": "cloud", "region": 3}, {"start": 35, "reference": "Main paper, Figs. 3(d), 7(a)", "panel": "pipeline", "region": 3}, {"start": 38, "reference": "Main paper, Figs. 3(e), 7(b)", "panel": "pipeline", "region": 4}, {"start": 41, "reference": "Main paper, Table 2 (12 views), Supplementary Fig. 8", "panel": "results", "region": 12}, {"start": 47, "reference": "Main paper, Table 2, Fig. 5", "panel": "results", "region": 192}, {"start": 55, "reference": "Main paper, Table 2, Mip-NeRF 360, 192 views", "panel": "results", "region": 192}]; const tableData={"Mip-NeRF 360": [[{"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["17.34", ""], ["0.407", ""], ["0.433", ""]], "time": "0.9"}, {"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["18.03", ""], ["0.452", ""], ["0.460", ""]], "time": "2.4"}, {"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["OOM", ""], ["\u2014", ""], ["\u2014", ""]], "time": "\u2014"}, {"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["OOM", ""], ["\u2014", ""], ["\u2014", ""]], "time": "\u2014"}, {"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["OOM", ""], ["\u2014", ""], ["\u2014", ""]], "time": "\u2014"}], [{"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["17.38", ""], ["0.431", "snd"], ["0.414", "snd"]], "time": "7.2"}, {"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["20.89", "snd"], ["0.583", "snd"], ["0.295", "snd"]], "time": "8.2"}, {"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["23.99", "snd"], ["0.701", "snd"], ["0.212", "snd"]], "time": "9.5"}, {"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["26.59", "snd"], ["0.802", "snd"], ["0.149", "snd"]], "time": "9.8"}, {"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["27.60", "fst"], ["0.835", "snd"], ["0.131", "fst"]], "time": "10.0"}], [{"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["18.17", "snd"], ["0.427", ""], ["0.442", ""]], "time": "<0.1"}, {"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["19.73", ""], ["0.478", ""], ["0.375", ""]], "time": "<0.1"}, {"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["20.78", ""], ["0.517", ""], ["0.336", ""]], "time": "<0.1"}, {"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["20.85", ""], ["0.521", ""], ["0.331", ""]], "time": "<0.1"}, {"name": "AirSplat", "publication": "ECCV'26", "coverage": "2/9", "scores": [["20.98", ""], ["0.406", ""], ["0.419", ""]], "time": "<0.1"}], [{"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["18.38", "fst"], ["0.477", "fst"], ["0.375", "fst"]], "time": "1.8"}, {"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["21.46", "fst"], ["0.620", "fst"], ["0.269", "fst"]], "time": "1.9"}, {"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["24.32", "fst"], ["0.716", "fst"], ["0.200", "fst"]], "time": "2.1"}, {"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["26.84", "fst"], ["0.817", "fst"], ["0.146", "fst"]], "time": "2.4"}, {"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["27.51", "snd"], ["0.843", "fst"], ["0.136", "snd"]], "time": "3.0"}]], "Deep Blending": [[{"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["15.54", "snd"], ["0.680", "snd"], ["0.561", ""]], "time": "1.1"}, {"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["15.18", ""], ["0.687", "fst"], ["0.576", ""]], "time": "2.5"}, {"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["OOM", ""], ["\u2014", ""], ["\u2014", ""]], "time": "\u2014"}, {"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["OOM", ""], ["\u2014", ""], ["\u2014", ""]], "time": "\u2014"}, {"name": "InstantSplat", "publication": "arXiv'24", "coverage": "", "scores": [["OOM", ""], ["\u2014", ""], ["\u2014", ""]], "time": "\u2014"}], [{"name": "VGGT-X", "publication": "arXiv'25", "coverage": "1/2", "scores": [["15.17", ""], ["0.601", ""], ["0.587", ""]], "time": "9.3"}, {"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["18.08", "snd"], ["0.668", ""], ["0.499", "snd"]], "time": "9.1"}, {"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["19.18", "snd"], ["0.689", ""], ["0.482", "snd"]], "time": "11.3"}, {"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["20.17", ""], ["0.749", "fst"], ["0.475", ""]], "time": "14.0"}, {"name": "VGGT-X", "publication": "arXiv'25", "coverage": "", "scores": [["21.18", "snd"], ["0.760", "snd"], ["0.446", "snd"]], "time": "14.6"}], [{"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["16.49", "fst"], ["0.689", "fst"], ["0.540", "fst"]], "time": "<0.1"}, {"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["14.79", ""], ["0.669", ""], ["0.565", ""]], "time": "<0.1"}, {"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["17.50", ""], ["0.693", "snd"], ["0.511", ""]], "time": "<0.1"}, {"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["20.63", "snd"], ["0.736", ""], ["0.440", "snd"]], "time": "<0.1"}, {"name": "AirSplat", "publication": "ECCV'26", "coverage": "", "scores": [["OOM", ""], ["\u2014", ""], ["\u2014", ""]], "time": "\u2014"}], [{"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["15.45", ""], ["0.602", ""], ["0.551", "snd"]], "time": "2.6"}, {"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["18.39", "fst"], ["0.670", "snd"], ["0.478", "fst"]], "time": "2.8"}, {"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["20.59", "fst"], ["0.716", "fst"], ["0.431", "fst"]], "time": "2.9"}, {"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["21.02", "fst"], ["0.736", "snd"], ["0.425", "fst"]], "time": "3.3"}, {"name": "PerturbGS", "publication": "(Ours)", "coverage": "", "scores": [["23.78", "fst"], ["0.788", "fst"], ["0.379", "fst"]], "time": "3.5"}]]}; const figureSteps={"teaser": [[["3D-VFM initialization", [0, 8, 100, 30]], ["3DGS training acceleration", [0, 39, 100, 29]], ["PerturbGS (Ours)", [0, 69, 100, 31]]], [["3D-VFM initialization", [0, 8, 100, 30]], ["3DGS training acceleration", [0, 39, 100, 29]], ["PerturbGS (Ours)", [0, 69, 100, 31]]]], "ambiguity": [[["Input geometry", [0, 0, 56, 100]], ["Novel view", [57, 0, 43, 100]]], [["Input geometry", [0, 0, 56, 100]], ["Novel view", [57, 0, 43, 100]]]], "pipeline": [[["DA3 cameras", [0.9615384615384616, 20.27027027027027, 18.509615384615383, 64.86486486486487]], ["Bearing-rigidity test", [19.471153846153847, 44.5945945945946, 19.471153846153847, 45.270270270270274]], ["Pass or fail", [39.18269230769231, 16.216216216216218, 59.85576923076923, 81.75675675675676]]], [["Input and perturbed cameras", [3.7267080745341614, 26.8018018018018, 14.596273291925465, 10.135135135135135], {"polygon": [[7.349896480331263, 41.44144144144144], [12.422360248447205, 37.83783783783784], [14.596273291925465, 40.765765765765764], [14.492753623188406, 43.01801801801802], [13.768115942028986, 48.873873873873876], [12.836438923395445, 48.873873873873876], [7.349896480331263, 43.468468468468465]]}, [1.3457556935817805, 87.83783783783784, 21.22153209109731, 10.135135135135135], {"polygon": [[7.349896480331263, 81.98198198198199], [11.076604554865424, 75.90090090090091], [12.629399585921325, 75.90090090090091], [14.285714285714286, 77.25225225225225], [14.285714285714286, 85.36036036036036], [7.453416149068323, 84.009009009009]]}], ["On-surface point", [3.7267080745341614, 26.8018018018018, 14.596273291925465, 10.135135135135135], {"polygon": [[7.349896480331263, 41.44144144144144], [12.422360248447205, 37.83783783783784], [14.596273291925465, 40.765765765765764], [14.492753623188406, 43.01801801801802], [13.768115942028986, 48.873873873873876], [12.836438923395445, 48.873873873873876], [7.349896480331263, 43.468468468468465]]}, [1.3457556935817805, 87.83783783783784, 21.22153209109731, 10.135135135135135], {"polygon": [[7.349896480331263, 81.98198198198199], [11.076604554865424, 75.90090090090091], [12.629399585921325, 75.90090090090091], [14.285714285714286, 77.25225225225225], [14.285714285714286, 85.36036036036036], [7.453416149068323, 84.009009009009]]}, {"polygon": [[15.113871635610765, 41.21621621621622], [68.73706004140787, 38.06306306306306], [68.73706004140787, 39.86486486486486], [15.113871635610765, 43.01801801801802]]}, {"polygon": [[14.906832298136646, 77.02702702702703], [68.53002070393374, 38.06306306306306], [68.73706004140787, 39.86486486486486], [15.113871635610765, 78.82882882882883]]}, [66.87370600414079, 35.36036036036036, 3.7267080745341614, 7.4324324324324325], [71.63561076604555, 34.909909909909906, 26.60455486542443, 27.25225225225225], [55.48654244306418, 17.792792792792792, 26.70807453416149, 8.783783783783784]], ["Off-surface point removed", [3.7267080745341614, 26.8018018018018, 14.596273291925465, 10.135135135135135], {"polygon": [[7.349896480331263, 41.44144144144144], [12.422360248447205, 37.83783783783784], [14.596273291925465, 40.765765765765764], [14.492753623188406, 43.01801801801802], [13.768115942028986, 48.873873873873876], [12.836438923395445, 48.873873873873876], [7.349896480331263, 43.468468468468465]]}, [1.3457556935817805, 87.83783783783784, 21.22153209109731, 10.135135135135135], {"polygon": [[7.349896480331263, 81.98198198198199], [11.076604554865424, 75.90090090090091], [12.629399585921325, 75.90090090090091], [14.285714285714286, 77.25225225225225], [14.285714285714286, 85.36036036036036], [7.453416149068323, 84.009009009009]]}, {"polygon": [[14.596273291925465, 47.747747747747745], [42.2360248447205, 73.64864864864865], [42.028985507246375, 75.45045045045045], [14.389233954451345, 49.549549549549546]]}, {"polygon": [[14.699792960662526, 80.18018018018019], [68.63354037267081, 68.01801801801801], [68.73706004140787, 70.04504504504504], [14.803312629399587, 81.98198198198199]]}, [17.908902691511386, 44.5945945945946, 15.217391304347826, 8.333333333333334], [24.74120082815735, 54.054054054054056, 1.5527950310559007, 9.45945945945946], [39.75155279503105, 70.27027027027027, 4.968944099378882, 9.45945945945946], {"polygon": [[44.099378881987576, 78.15315315315316], [44.824016563147, 78.37837837837837], [44.824016563147, 79.72972972972973], [66.87370600414079, 74.09909909909909], [66.87370600414079, 76.12612612612612], [44.20289855072464, 81.53153153153153]]}, [67.0807453416149, 65.76576576576576, 3.3126293995859215, 6.981981981981982], [71.73913043478261, 64.1891891891892, 22.56728778467909, 20.945945945945947], [38.302277432712216, 85.8108108108108, 34.368530020703936, 9.684684684684685]]], [["Per-view point clouds", [1.271186440677966, 16.216216216216218, 44.91525423728814, 11.486486486486486], [3.389830508474576, 33.108108108108105, 37.28813559322034, 62.16216216216216]], ["Fuse", [7.627118644067797, 50.67567567567568, 30.508474576271187, 31.756756756756758], [40.67796610169491, 53.37837837837838, 18.220338983050848, 13.513513513513514], [62.71186440677966, 71.62162162162163, 5.508474576271187, 8.108108108108109]], ["Initial point cloud", [58.05084745762712, 16.216216216216218, 40.25423728813559, 10.81081081081081], [61.86440677966102, 50.0, 32.6271186440678, 45.945945945945944]]], [["Input and perturbed cameras", [1.6877637130801688, 19.333333333333332, 62.0253164556962, 25.333333333333332]], ["Contribution", [64.55696202531645, 17.333333333333332, 34.59915611814346, 27.333333333333332]], ["Prune low-contribution Gaussians", [2.109704641350211, 47.333333333333336, 96.62447257383967, 46.666666666666664]]], [["Perturb view", [0.3389830508474576, 16.666666666666668, 17.966101694915253, 76.66666666666667]], ["One tile", [18.47457627118644, 16.666666666666668, 16.779661016949152, 80.0]], ["Parallax", [35.42372881355932, 16.666666666666668, 11.864406779661017, 78.66666666666667]], ["Rank candidates in q", [47.45762711864407, 16.666666666666668, 21.35593220338983, 78.66666666666667]], ["One growth slot in q", [69.15254237288136, 16.666666666666668, 30.338983050847457, 79.33333333333333]]]], "cloud": [[["Original geometry", [0, 0, 100, 90]]], [["Camera poses", [0, 0, 100, 90]]], [["Filtered geometry", [0, 0, 100, 87]]], [["Consolidated geometry", [0, 0, 100, 87]]]]};function setupFigureWalkthrough(panel) {
+  const surface = panel.querySelector('.figure-surface');
+  const original = surface.querySelector('img');
+  const notes = [...panel.querySelectorAll('.region-note')];
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const bar = document.createElement('div');
+  bar.className = 'figure-steps';
+  bar.hidden = true;
+  bar.innerHTML = '<div class="figure-step-heading"><strong></strong><button class="show-figure" type="button">Show full figure</button></div><div class="figure-step-controls" role="group" aria-label="Walkthrough steps"></div>';
+  surface.parentElement.after(bar);
+  const controls = bar.querySelector('.figure-step-controls');
+  const full = bar.querySelector('.show-figure');
+  const playFilm = document.createElement('button');
+  playFilm.type = 'button';
+  full.before(playFilm);
+  playFilm.addEventListener('click', () => {
+    autoPending = false;
+    stop();
+    playChapter(Number(notes[current].dataset.chapter), true);
+  });
+  const ns = 'http://www.w3.org/2000/svg';
+  function svgNode(tag, attributes, parent) {
+    const node = document.createElementNS(ns, tag);
+    for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
+    parent.append(node);
+    return node;
+  }
+
+  // Overlay coordinates use the measured crops of Fig. 3(b) and (c).
+  let detailOverlay;
+  let detailFrame;
+  function animateDetail(index) {
+    cancelAnimationFrame(detailFrame);
+    detailOverlay?.remove();
+    detailOverlay = null;
+    if (panel.id !== 'pipeline') return;
+    const rays = current === 1 && (index === 1 || index === 2);
+    const fuse = current === 2 && index === 1;
+    if (!rays && !fuse) return;
+    const vb = graphic.querySelector('clipPath rect');
+    detailOverlay = svgNode('svg', {
+      width:vb.getAttribute('width'), height:vb.getAttribute('height'),
+      viewBox:rays ? '0 0 966 444' : '0 0 708 444', preserveAspectRatio:'none',
+      'aria-hidden':'true', 'pointer-events':'none', class:'figure-detail-motion'
+    },graphic);
+    const particles = [];
+    function travel(from,to,fill,radius) {
+      const dot = svgNode('circle',{cx:to[0],cy:to[1],r:radius,fill},detailOverlay);
+      particles.push({dot,from,to});
+    }
+    if (rays) {
+      const keep = index===1;
+      const color = keep ? '#286e59' : '#4e627c';
+      const paths = keep ? [[[138,187],[650,174]],[[136,350],[650,178]]]
+                        : [[[135,214],[398,327]],[[136,360],[650,309]]];
+      for (const [from,to] of paths) {
+        svgNode('line',{x1:from[0],y1:from[1],x2:to[0],y2:to[1],
+          stroke:color,'stroke-width':1.5,opacity:.65},detailOverlay);
+        travel(from,to,color,4);
+      }
+    } else {
+      const target = [456,342];
+      for (const observation of [[80,323],[92,315],[106,344]]) {
+        travel(observation,target,'#08796e',7);
+      }
+    }
+    if (!reducedMotion.matches) {
+      const start = performance.now();
+      function advance(now) {
+        const t = Math.max(0,Math.min(1,(now-start)/1100));
+        for (const {dot,from,to} of particles) {
+          dot.setAttribute('cx',from[0]+t*(to[0]-from[0]));
+          dot.setAttribute('cy',from[1]+t*(to[1]-from[1]));
+        }
+        if (t<1) detailFrame = requestAnimationFrame(advance);
+      }
+      advance(start);
+    }
+  }
+
+  let current = -1;
+  let awaitingImage = -1;
+  let autoPending = false;
+  let inView = false;
+  let stage = 0;
+  let timer;
+  let graphic;
+  let zoomFrame = 0;
+  let lights = [];
+  let buttons = [];
+  let transport;
+  function stop() {
+    clearTimeout(timer);
+    timer = null;
+    if (transport) transport.textContent = stage === lights.length ? 'Replay' : 'Play';
+  }
+  function selectStep(index) {
+    stage = index;
+    animateDetail(index);
+    graphic.classList.toggle('walkthrough-complete', index === lights.length);
+    lights.forEach((light, i) => light.classList.toggle('lit', i === index));
+    buttons.forEach((button, i) => {
+      if (i === index) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+  }
+  function play() {
+    stop();
+    if (stage === lights.length) selectStep(0);
+    function advance() {
+      selectStep(stage + 1);
+      if (stage === lights.length) stop();
+      else timer = setTimeout(advance, 1550);
+    }
+    transport.textContent = 'Pause';
+    timer = setTimeout(advance, 1550);
+  }
+  function fullFigure() {
+    cancelAnimationFrame(detailFrame);
+    awaitingImage = -1;
+    autoPending = false;
+    stop();
+    cancelAnimationFrame(zoomFrame);
+    zoomFrame = 0;
+    graphic?.remove();
+    graphic = null;
+    surface.classList.remove('isolated');
+    bar.hidden = true;
+    current = -1;
+    for (const note of notes) {
+      note.setAttribute('aria-pressed', 'false');
+    }
+  }
+  function show(index) {
+    if (!original.naturalWidth) {
+      awaitingImage = index;
+      return;
+    }
+    awaitingImage = -1;
+    stop();
+    cancelAnimationFrame(zoomFrame);
+    zoomFrame = 0;
+    graphic?.remove();
+    current = index;
+    const note = notes[index];
+    playFilm.hidden = !note.hasAttribute('data-chapter');
+    if (!playFilm.hidden) {
+      const seconds = chapters[Number(note.dataset.chapter)].start;
+      playFilm.textContent = 'Watch in film · ' + Math.floor(seconds/60) + ':' + String(seconds%60).padStart(2,'0');
+    }
+    notes.forEach((n, i) => n.setAttribute('aria-pressed', String(i === index)));
+    const [left, top, width, height] = note.dataset.box.split(',').map(Number);
+    const cropW = original.naturalWidth * width / 100;
+    const cropH = original.naturalHeight * height / 100;
+    const prefix = panel.id + '-walk';
+    const title = note.querySelector('b').textContent;
+    graphic = svgNode('svg', {viewBox:`0 0 ${cropW} ${cropH}`, role:'img', 'aria-label':title}, surface);
+    const defs = svgNode('defs', {}, graphic);
+    svgNode('image', {id:prefix+'-img', href:original.currentSrc || original.src,
+      x:-original.naturalWidth*left/100, y:-original.naturalHeight*top/100,
+      width:original.naturalWidth, height:original.naturalHeight}, defs);
+    const bounds = svgNode('clipPath', {id:prefix+'-panel'}, defs);
+    svgNode('rect', {width:cropW, height:cropH}, bounds);
+    const layers = svgNode('g', {'clip-path':`url(#${prefix}-panel)`}, graphic);
+    const stacked = note.dataset.layout === 'stacked';
+    const imageRef = '#' + prefix + '-img';
+    let rowTop = 0;
+    let rowWidth = 0;
+    if (!stacked) svgNode('use', {href:imageRef, class:'walkthrough-base'}, layers);
+    surface.classList.add('isolated');
+    bar.querySelector('strong').textContent = note.dataset.reference + ' · ' + title;
+    bar.hidden = false;
+    controls.replaceChildren();
+    lights = [];
+    buttons = [];
+    const steps = figureSteps[panel.id][index];
+    steps.forEach(([label, ...regions], i) => {
+      if (stacked) {
+        const [x,y,w,h] = regions[0];
+        const width = cropW*w/100, height = cropH*h/100;
+        // Give each paper panel its own viewport at the same scale.
+        const row = svgNode('svg', {x:0, y:rowTop, width, height, overflow:'hidden',
+          viewBox:`${cropW*x/100} ${cropH*y/100} ${width} ${height}`}, graphic);
+        svgNode('use', {href:imageRef, class:'walkthrough-base'}, row);
+        lights.push(svgNode('use', {href:imageRef, class:'step-light'}, row));
+        rowTop += height + 12;
+        rowWidth = Math.max(rowWidth, width);
+      } else {
+        const id = prefix+'-step-'+i;
+        const mask = svgNode('clipPath', {id}, defs);
+        for (const region of regions) {
+          if (region.polygon) {
+            const points = region.polygon.map(([x,y]) => [cropW*x/100, cropH*y/100].join(','));
+            svgNode('polygon', {points:points.join(' ')}, mask);
+          } else {
+            const [x,y,w,h] = region;
+            svgNode('rect', {x:cropW*x/100, y:cropH*y/100, width:cropW*w/100, height:cropH*h/100}, mask);
+          }
+        }
+        lights.push(svgNode('use', {href:imageRef, 'clip-path':`url(#${id})`, class:'step-light'}, layers));
+      }
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.addEventListener('click', () => { autoPending = false; selectStep(i); stop(); });
+      controls.append(button);
+      buttons.push(button);
+    });
+    if (stacked) {
+      graphic.setAttribute('viewBox', `0 0 ${rowWidth} ${rowTop - 12}`);
+      graphic.classList.add('stacked-steps');
+    }
+    transport = document.createElement('button');
+    transport.type = 'button';
+    transport.textContent = 'Play';
+    transport.addEventListener('click', () => {
+      autoPending = false;
+      if (timer !== null) stop();
+      else play();
+    });
+    controls.append(transport);
+    selectStep(0);
+    autoPending = !reducedMotion.matches;
+    if (!reducedMotion.matches && !stacked) {
+      const whole = [-original.naturalWidth*left/100, -original.naturalHeight*top/100,
+        original.naturalWidth, original.naturalHeight];
+      const target = [0, 0, cropW, cropH];
+      const panelWidth = surface.clientWidth;
+      const startHeight = panelWidth * whole[3] / whole[2];
+      const endHeight = graphic.getBoundingClientRect().height;
+      const context = svgNode('g', {}, graphic);
+      svgNode('use', {href:imageRef}, context);
+      svgNode('rect', {width:cropW, height:cropH, fill:'none', stroke:'#4059ad',
+        'stroke-width':2, 'vector-effect':'non-scaling-stroke'}, context);
+      const start = performance.now();
+      function zoom(now) {
+        const t = Math.min(1, Math.max(0, (now - start) / 720));
+        const ease = t*t*(3-2*t);
+        graphic.setAttribute('viewBox', whole.map((v,i) => v + (target[i]-v)*ease).join(' '));
+        graphic.style.height = (startHeight + (endHeight-startHeight)*ease) + 'px';
+        context.setAttribute('opacity', Math.min(1, (1-t)*4));
+        if (t < 1) {
+          zoomFrame = requestAnimationFrame(zoom);
+        } else {
+          context.remove();
+          graphic.style.removeProperty('height');
+          graphic.style.removeProperty('max-height');
+          zoomFrame = 0;
+          startWhenVisible();
+        }
+      }
+      graphic.style.maxHeight = 'none';
+      zoom(start);
+    } else {
+      startWhenVisible();
+    }
+  }
+  function startWhenVisible() {
+    if (!zoomFrame && autoPending && inView && !panel.hidden && !document.hidden) {
+      autoPending = false;
+      play();
+    }
+  }
+  const observer = new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    startWhenVisible();
+  }, {threshold:0.1});
+  observer.observe(surface);
+  original.addEventListener('load', () => {
+    if (awaitingImage >= 0 && !panel.hidden) show(awaitingImage);
+  });
+  notes.forEach((note, i) => {
+    const hit = document.createElement('span');
+    hit.className = 'figure-hit';
+    hit.setAttribute('aria-hidden','true');
+    const [left,top,width,height] = note.dataset.box.split(',').map(n=>n+'%');
+    Object.assign(hit.style,{left,top,width,height});
+    surface.append(hit);
+    hit.addEventListener('click', () => show(i));
+    note.addEventListener('click', () => show(i));
+  });
+  full.addEventListener('click', () => {
+    const tab = document.querySelector('[data-figure="'+panel.id+'"]');
+    fullFigure();
+    tab.focus({preventScroll:true});
+  });
+  panel.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && current >= 0) full.click();
+  });
+  panel.addEventListener('leavefigure', fullFigure);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && timer != null) {
+      autoPending = true;
+      stop();
+    } else startWhenVisible();
+  });
+}
+const figures = [...document.querySelectorAll('[data-figure]')];
+const film = document.getElementById('film');
+const figureHint = document.getElementById('figure-hint');
+const standardHint = figureHint.textContent;
+for (const tab of figures) {
+  tab.addEventListener('click', () => {
+    figureHint.textContent = tab.dataset.figure==='cloud' ? 'Follow the same scene through CPI, or select a stage to jump to it.' : standardHint;
+    for (const choice of figures) {
+      const panel = document.getElementById(choice.dataset.figure);
+      const active = choice === tab;
+      choice.setAttribute('aria-pressed', String(active));
+      if (!active && !panel.hidden) panel.dispatchEvent(new Event('leavefigure'));
+      const entering = active && panel.hidden;
+      panel.hidden = !active;
+      if (entering) panel.dispatchEvent(new Event('enterfigure'));
+    }
+  });
+}
+const dialog = document.getElementById('dialog');
+for (const panel of document.querySelectorAll('.paper-figure')) {
+  if (panel.id === 'cloud') setupCloudSequence(panel);
+  else setupFigureWalkthrough(panel);
+  panel.querySelector('.enlarge-paper').addEventListener('click', () => {
+    const original = panel.querySelector('img'), image = dialog.querySelector('img');
+    image.src = original.src;
+    image.alt = original.alt;
+    dialog.showModal();
+  });
+}
+document.getElementById('close').addEventListener('click', () => dialog.close());
+function setupCloudSequence(panel) {
+  const clip = panel.querySelector('video');
+  const notes = [...panel.querySelectorAll('.region-note')];
+  const first = chapters[Number(notes[0].dataset.chapter)].start;
+  const starts = notes.map(note => chapters[Number(note.dataset.chapter)].start-first);
+  const counts = ['26.13M original points', 'Predicted → refined poses', '24.50M filtered points', '2.37M consolidated points'];
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const watch = panel.querySelector('.cpi-watch');
+  function markStage(index) {
+    watch.dataset.chapter = notes[index].dataset.chapter;
+    notes.forEach((note,i) => note.setAttribute('aria-pressed',String(i===index)));
+    panel.querySelector('#cpi-current').textContent = notes[index].dataset.reference+' · '+counts[index];
+  }
+  function startStage(index) {
+    markStage(index);
+    clip.currentTime = starts[index];
+    if (!reducedMotion.matches) clip.play().catch(() => {});
+  }
+  function syncStage() {
+    const index = starts.findLastIndex(start => start<=clip.currentTime);
+    if (index>=0 && notes[index].getAttribute('aria-pressed')!=='true') markStage(index);
+  }
+  watch.addEventListener('click',() => playChapter(Number(watch.dataset.chapter),true));
+  notes.forEach((note,i) => note.addEventListener('click',() => startStage(i)));
+  clip.addEventListener('timeupdate',syncStage);
+  clip.addEventListener('seeked',syncStage);
+  clip.addEventListener('play',() => film.pause());
+  film.addEventListener('play',() => clip.pause());
+  panel.addEventListener('enterfigure',() => startStage(0));
+  panel.addEventListener('leavefigure',() => clip.pause());
+  markStage(0);
+}
+function playChapter(index, moveToFilm = false) {
+  if (moveToFilm) {
+    film.scrollIntoView({block:'center'});
+    film.focus({preventScroll:true});
+  }
+  film.currentTime = chapters[index].start;
+  film.play().catch(() => film.focus());
+}
+const inspectFrame = document.getElementById('inspect-frame');
+function currentChapter() {
+  return chapters.filter(chapter => chapter.start <= film.currentTime).at(-1);
+}
+function selectChapter() {
+  const chapter = currentChapter();
+  document.getElementById('film-source').textContent = chapter?.reference ?? '';
+  inspectFrame.hidden = !chapter;
+  if (!chapter) return;
+  inspectFrame.textContent = chapter.panel === 'results' ? 'Explore Table 2' : 'Explore this figure';
+}
+inspectFrame.addEventListener('click', () => {
+  film.pause();
+  const chapter = currentChapter();
+  if (!chapter) return;
+  const {panel:id, region} = chapter;
+  if (id === 'results') {
+    dataset.value = 'Mip-NeRF 360';
+    views.value = String(region);
+    displayResults();
+    document.getElementById('results').scrollIntoView();
+    views.focus({preventScroll:true});
+    return;
+  }
+  document.querySelector('[data-figure="'+id+'"]').click();
+  const note = document.querySelectorAll('#'+id+' .region-note')[Number(region)];
+  note.click();
+  document.querySelector('#'+id+' :is(.figure-surface,.cpi-viewer)').scrollIntoView({block:'center'});
+  note.focus({preventScroll:true});
+});
+if (new URLSearchParams(location.search).get('scene')==='kitchen') {
+  const kitchen = chapters.find(chapter => chapter.panel==='results' && chapter.region===12);
+  const showKitchen = () => { film.currentTime = kitchen.start; };
+  if (film.readyState>=1) showKitchen();
+  else film.addEventListener('loadedmetadata',showKitchen,{once:true});
+}
+film.addEventListener('timeupdate', selectChapter);
+film.addEventListener('seeked', selectChapter);
+selectChapter();
+const dataset = document.getElementById('dataset'), views = document.getElementById('views');
+function displayResults(){
+  const index = views.selectedIndex, tbody = document.getElementById('metrics');
+  tbody.replaceChildren();
+  for (const method of tableData[dataset.value]) {
+    const entry = method[index];
+    const row = tbody.insertRow();
+    const name = document.createElement('th');
+    name.scope = 'row';
+    name.textContent = entry.name + ' ';
+    const venue = document.createElement('small');
+    venue.textContent = entry.publication;
+    name.append(venue);
+    if (entry.coverage) name.append(' (' + entry.coverage + ')');
+    row.append(name);
+    for (const [value, rank] of entry.scores) {
+      const cell = row.insertCell();
+      const text = document.createElement(rank === 'fst' ? 'strong' : rank === 'snd' ? 'u' : 'span');
+      text.textContent = value;
+      cell.append(text);
+    }
+    row.insertCell().textContent = entry.time;
+  }
+  document.getElementById('result-caption').textContent =
+    'Main paper · Table 2 · ' + dataset.value + ' · ' + views.value + ' training views';
+  const ours = tableData[dataset.value].at(-1)[index];
+  const other = tableData[dataset.value][1][index];
+  const finding = document.getElementById('result-finding');
+  if (dataset.value === 'Mip-NeRF 360' && views.value === '192') {
+    finding.textContent = 'At 192 views, PerturbGS reaches ' + ours.scores[0][0] + ' dB in ' + ours.time +
+      ' minutes. VGGT-X reaches ' + other.scores[0][0] + ' dB in ' + other.time + ' minutes.';
+  } else {
+    const leads = ours.scores.filter(([,rank]) => rank === 'fst').length === 3;
+    finding.textContent = 'At ' + views.value + ' training views, PerturbGS achieves ' + ours.scores[0][0] +
+      ' dB PSNR, ' + ours.scores[1][0] + ' SSIM, and ' + ours.scores[2][0] + ' LPIPS in ' + ours.time +
+      ' minutes.' + (leads ? ' It leads the ranked methods on all three quality metrics.' : '');
+  }
+}
+dataset.addEventListener('change', displayResults);
+views.addEventListener('change', displayResults);
+displayResults();
+
+const cameraShift = document.getElementById('camera-offset');
+const surface = {depth:160, color:'#08796e'};
+const offSurface = {depth:85, color:'#b45630'};
+const depthContext = document.getElementById('depth-view').getContext('2d');
+const sceneContext = document.getElementById('ray-view').getContext('2d');
+const filterState = document.getElementById('filter-state');
+const filterNote = document.getElementById('parallax-note');
+
+
+function drawLine(ctx, x, y, endX, endY, color) {
+  ctx.strokeStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+  ctx.lineTo(endX,endY);
+  ctx.stroke();
+}
+
+// The lens center is the origin of both the top-view frustum and the depth projection.
+function drawSceneCamera(ctx, x, y, originalPose = false) {
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = originalPose ? '#aaa598' : '#5d584f';
+  ctx.fillStyle = '#726b61';
+  if (originalPose) ctx.setLineDash([4,3]);
+  ctx.beginPath();
+  ctx.roundRect(-18,9,36,20,4);
+  ctx.moveTo(-7,9);
+  ctx.lineTo(-12,0);
+  ctx.lineTo(12,0);
+  ctx.lineTo(7,9);
+  ctx.closePath();
+  if (!originalPose) ctx.fill();
+  ctx.stroke();
+  if (!originalPose) {
+    drawLine(ctx,-10,2,10,2,'#ded4c1');
+    ctx.fillStyle = '#ded4c1';
+    ctx.fillRect(-12,14,8,3);
+  }
+  ctx.restore();
+}
+
+function drawDepthExample(shift, removal) {
+  const inputX = 320;
+  const cameraX = inputX + shift;
+  const cameraY = 195;
+  const imageLeft = 18, imageWidth = 495;
+  const imageCenter = imageLeft + imageWidth/2;
+  const focalLength = 190;
+  const projectX = (worldX, depth) => imageCenter + focalLength*(worldX-cameraX)/depth;
+  const halfWidth = surface.depth*imageWidth/(2*focalLength);
+  const farY = cameraY-surface.depth;
+  const world = sceneContext;
+  const map = depthContext;
+  world.clearRect(0,0,640,230);
+  map.clearRect(0,0,640,230);
+
+  world.save();
+  world.beginPath();
+  world.moveTo(cameraX,cameraY);
+  world.lineTo(cameraX-halfWidth,farY);
+  world.lineTo(cameraX+halfWidth,farY);
+  world.closePath();
+  world.fillStyle = '#f8ecda';
+  world.fill();
+  world.strokeStyle = '#d9bc98';
+  world.lineWidth = 1.5;
+  world.stroke();
+  world.setLineDash([4,5]);
+  drawLine(world,cameraX,cameraY,cameraX,farY,'#b9ac99');
+  world.restore();
+
+  world.lineWidth = 2;
+  drawLine(world,130,farY,510,farY,'#91b5ae');
+  drawLine(world,inputX,cameraY+19,inputX+100,cameraY+19,'#cec9be');
+  if (shift>0) drawSceneCamera(world,inputX,cameraY,true);
+
+  // The front-facing plane has constant camera-space depth under lateral motion.
+  const planeLeft = Math.max(imageLeft,projectX(130,surface.depth));
+  const planeRight = Math.min(imageLeft+imageWidth,projectX(510,surface.depth));
+  map.fillStyle = '#f8f9f7';
+  map.fillRect(imageLeft,20,imageWidth,185);
+  map.fillStyle = '#ccd2d0';
+  map.fillRect(planeLeft,40,planeRight-planeLeft,145);
+  const scale = map.createLinearGradient(0,47,0,178);
+  scale.addColorStop(0,'#414b49');
+  scale.addColorStop(1,'#ccd2d0');
+  map.fillStyle = scale;
+  map.fillRect(534,47,12,131);
+  map.font = '600 18px system-ui,sans-serif';
+  map.fillStyle = '#4d5844';
+  map.fillText('Near',553,57);
+  map.fillText('Far',553,177);
+
+  for (const point of [surface,offSurface]) {
+    const candidate = point === offSurface;
+    const opacity = candidate ? 1-removal : 1;
+    const sceneY = cameraY-point.depth;
+    const imageX = projectX(320,point.depth);
+    world.save();
+    map.save();
+    world.globalAlpha = map.globalAlpha = opacity;
+    drawLine(world,cameraX,cameraY,inputX,sceneY,point.color);
+    world.fillStyle = point.color;
+    world.beginPath();
+    world.ellipse(320,sceneY,10,7.7,-.25,0,2*Math.PI);
+    world.fill();
+    map.fillStyle = candidate ? '#414b49' : '#ccd2d0';
+    map.strokeStyle = point.color;
+    map.lineWidth = 4;
+    map.beginPath();
+    map.arc(imageX,112,candidate ? 16 : 11,0,2*Math.PI);
+    map.fill();
+    map.stroke();
+    world.restore();
+    map.restore();
+
+    if (candidate && removal>0 && removal<1) {
+      for (const [ctx,x,y] of [[world,320,sceneY],[map,imageX,112]]) {
+        ctx.save();
+        ctx.globalAlpha = Math.sin(Math.PI*removal);
+        ctx.lineWidth = 3;
+        drawLine(ctx,x-9,y-9,x+9,y+9,'#963e20');
+        drawLine(ctx,x+9,y-9,x-9,y+9,'#963e20');
+        ctx.restore();
+      }
+    }
+  }
+  drawSceneCamera(world,cameraX,cameraY);
+}
+
+function setFilterState(stage, label, note) {
+  if (filterState.dataset.stage === stage) return;
+  filterState.dataset.stage = stage;
+  filterState.textContent = label;
+  filterNote.textContent = note;
+}
+
+// Both examples use the same playback clock as their manual slider.
+function sliderPlayback(slider, buttonId, end, millisecondsPerUnit, draw) {
+  const button = document.getElementById(buttonId);
+  let position = Number(slider.value);
+  let frame = null;
+  function pause() {
+    cancelAnimationFrame(frame);
+    frame = null;
+    button.textContent = position >= end ? 'Replay' : 'Play';
+  }
+  function seek(value) {
+    position = value;
+    pause();
+    draw(position);
+  }
+  function play() {
+    if (position >= end) seek(0);
+    const start = performance.now();
+    const initial = position;
+    button.textContent = 'Pause';
+    function tick(now) {
+      position = Math.min(end,initial+Math.max(0,now-start)/millisecondsPerUnit);
+      draw(position);
+      if (position >= end) pause();
+      else frame = requestAnimationFrame(tick);
+    }
+    frame = requestAnimationFrame(tick);
+  }
+  button.addEventListener('click',() => {
+    if (frame === null) play();
+    else pause();
+  });
+  document.addEventListener('visibilitychange',() => { if (document.hidden) pause(); });
+  return {pause,seek,play};
+}
+
+function renderDepthPosition(position) {
+  const shift = Math.min(100,Math.floor(position));
+  const removal = Math.min(1,Math.max(0,(position-105)/15));
+  cameraShift.value = shift;
+  document.getElementById('shift-value').value = shift+'%';
+  drawDepthExample(shift,removal);
+  if (shift===0) {
+    setFilterState('input','Input view','Both points lie on the same camera ray. The nearer point hides the surface point in the depth map.');
+  } else if (removal===1) {
+    setFilterState('filtered','Off-surface point removed','In this example, deletion votes outnumber supporting votes for the off-surface point. CPI removes it and retains the depth-consistent surface point.');
+  } else {
+    setFilterState('conflict','Checking depth','The nearer point shifts farther across the depth map. At its new pixel, its depth is smaller than the reference surface depth, which counts as a deletion vote.');
+  }
+}
+const depthPlayback = sliderPlayback(cameraShift,'depth-play',120,46,renderDepthPosition);
+cameraShift.addEventListener('input',() => {
+  const shift = Number(cameraShift.value);
+  depthPlayback.seek(shift);
+  if (shift===100) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) depthPlayback.seek(120);
+    else depthPlayback.play();
+  }
+});
+depthPlayback.seek(0);
+
+const exampleChoices = document.querySelectorAll('.example-picker input');
+for (const choice of exampleChoices) {
+  choice.addEventListener('change', () => {
+    depthPlayback.pause();
+    groupPlayback.pause();
+    cancelAnimationFrame(cameraMotionFrame);
+    for (const option of exampleChoices) {
+      document.getElementById(option.getAttribute('aria-controls')).hidden = !option.checked;
+    }
+  });
+}
+
+let cameraMotionFrame;
+const groupProgress = document.getElementById('group-progress');
+const tile = document.getElementById('tile-displacement').getContext('2d');
+const groupButtons = [...document.querySelectorAll('.group-steps button')];
+// Schematic values. All shifts are horizontal, so distance alone separates the illustrated bins.
+const candidates = [
+  {name:'A', scores:[.78,.22], x:3,y:3, shift:2.0},
+  {name:'B', scores:[.67,.33], x:8,y:8, shift:2.4},
+  {name:'C', scores:[.72,.28], x:7,y:13, shift:5.0},
+  {name:'D', scores:[.63,.37], x:21,y:7, shift:2.2},
+  {name:'E', scores:[.24,.76], x:3,y:5, shift:2.3}
+].map(g => ({
+  ...g, view:g.scores.indexOf(Math.max(...g.scores))+1,
+  tile:Math.floor(g.x/16)+1, bin:Math.floor(g.shift)
+}));
+const anchor = candidates[0];
+const anchorTile = candidates.filter(g => g.view===anchor.view && g.tile===anchor.tile);
+const shiftBins = [...new Set(anchorTile.map(g => g.bin))].sort((a,b) => a-b);
+const groupLabel = bin => 'Group '+(shiftBins.indexOf(bin)+1);
+const memberRows = candidates.map(g => {
+  const row = document.createElement('tr');
+  const heading = document.createElement('th');
+  heading.scope = 'row';
+  heading.textContent = g.name;
+  row.append(heading);
+  for (let i=0;i<4;i++) row.insertCell();
+  document.getElementById('group-members').append(row);
+  return row;
+});
+const groupSteps = [
+  ['Assign view','Contribution by input view','Each Gaussian goes to the view where it contributes most. A–D choose View 1. E contributes more to View 2 and leaves A’s candidate set. Bar lengths show illustrative relative contributions.'],
+  ['Locate tile','Projected centers in View 1','Tile membership uses the original projected center. A, B and C land in Tile 1. D lands in Tile 2, so it cannot share A’s budget.'],
+  ['Measure shift','Displacement under camera perturbation','As the camera moves right, the projected centers move left. The outlines mark their input positions. Select Measure shift to replay, or drag the slider to inspect the motion. Distances are illustrative.'],
+  ['Form group','Groups in View 1, Tile 1','A and B shift by 2.0 and 2.4 pixels and share a densification budget. C shifts by 5.0 pixels and forms a separate group.'],
+  ['Apply budget','One growth slot for A and B','In this example the group budget is three Gaussians. A ranks first and splits into two children. B stays intact, bringing the group total to three.']
+];
+
+function groupText(ctx, text, x, y, color='#4d5844') {
+  ctx.font = '600 22px "Noto Sans",sans-serif';
+  ctx.fillStyle = color;
+  ctx.fillText(text,x,y);
+}
+
+function drawGaussian(ctx, x, y, size, color, outline=false) {
+  ctx.beginPath();
+  ctx.ellipse(x,y,size,size*.62,-.32,0,2*Math.PI);
+  if (outline) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+}
+
+function cameraMarker(x,y,ghost) {
+  tile.save();
+  tile.translate(x,y);
+  tile.strokeStyle = ghost ? '#91a49d' : '#155c53';
+  tile.fillStyle = ghost ? '#fff' : '#18776b';
+  tile.lineWidth = 2;
+  if (ghost) tile.setLineDash([4,3]);
+  tile.beginPath();
+  tile.moveTo(-7,-9);
+  tile.lineTo(-13,-19);
+  tile.lineTo(13,-19);
+  tile.lineTo(7,-9);
+  tile.closePath();
+  tile.fill();
+  tile.stroke();
+  tile.fillRect(-19,-8,38,20);
+  tile.strokeRect(-19,-8,38,20);
+  if (!ghost) {
+    tile.fillStyle = '#d9efe7';
+    tile.fillRect(-13,-3,7,5);
+  }
+  tile.restore();
+}
+
+function drawCameraAndTiles(stage,motion) {
+  tile.clearRect(0,0,tile.canvas.width,tile.canvas.height);
+  const start = 188, finish = 445, railY = 61;
+  groupText(tile,'Input camera',start-66,25);
+  groupText(tile,'Perturbed camera',finish-85,25);
+  tile.lineWidth = 2;
+  drawLine(tile,start,railY,finish-4,railY,'#b7c6ba');
+  drawLine(tile,finish-14,railY-6,finish-4,railY,'#879c90');
+  drawLine(tile,finish-14,railY+6,finish-4,railY,'#879c90');
+  cameraMarker(start,railY,true);
+  cameraMarker(start+(finish-start)*motion,railY,false);
+
+  const scale = 12, left = 96, top = 122;
+  for (let i=0;i<2;i++) {
+    const x = left+192*i;
+    tile.fillStyle = i===0 ? '#edf5e8' : '#f6f6f2';
+    tile.fillRect(x,top,192,192);
+    tile.strokeStyle = '#b7c6b4';
+    tile.strokeRect(x,top,192,192);
+    groupText(tile,'Tile '+(i+1),x+8,top-9);
+  }
+  for (const g of candidates.filter(g => g.view===anchor.view)) {
+    const inTile = g.tile===anchor.tile;
+    const x = left+g.x*scale, y = top+g.y*scale;
+    const end = x-motion*g.shift*scale;
+    drawLine(tile,x,y,end,y,'#89998f');
+    drawGaussian(tile,x,y,11,'#889890',true);
+    drawGaussian(tile,end,y,11,inTile ? '#08796e' : '#647069');
+    const text = stage===2 && inTile ? g.name+'  '+(motion*g.shift).toFixed(1)+' px' : g.name;
+    groupText(tile,text,x+15,y+6);
+  }
+}
+
+function drawGroupExample() {
+  const progress = Number(groupProgress.value);
+  const stage = progress < 25 ? 0 : progress < 40 ? 1 : progress < 70 ? 2 : progress < 85 ? 3 : 4;
+  const [label,title,note] = groupSteps[stage];
+  document.getElementById('group-stage').value = label;
+  groupProgress.setAttribute('aria-valuetext',label);
+  document.getElementById('group-figure-title').textContent = title;
+  document.getElementById('group-note').textContent = note;
+  groupButtons.forEach((button,i) => button.setAttribute('aria-pressed',String(i===stage)));
+
+  const motion = Math.max(0,Math.min(1,(progress-40)/25));
+  const teal = '#08796e', gray = '#647069', rust = '#9a512b';
+  const height = stage===1 || stage===2 ? 332 : 265;
+  if (tile.canvas.height!==height) tile.canvas.height = height;
+  tile.clearRect(0,0,640,height);
+  for (const [i,g] of candidates.entries()) {
+    const sameView = g.view===anchor.view;
+    const sameTile = sameView && g.tile===anchor.tile;
+    const match = sameTile && g.bin===anchor.bin;
+    const row = memberRows[i];
+    row.cells[1].textContent = 'V'+g.view;
+    row.cells[2].textContent = stage>=1 && sameView ? 'T'+g.tile : '—';
+    row.cells[3].textContent = stage>=2 && sameTile ? (g.shift*motion).toFixed(1)+' px' : '—';
+    row.cells[4].textContent = stage>=3 && sameTile ? groupLabel(g.bin) : '—';
+    row.cells[1].classList.toggle('difference',!sameView);
+    row.cells[2].classList.toggle('difference',stage>=1 && sameView && !sameTile);
+    row.cells[4].classList.toggle('difference',stage>=3 && sameTile && !match);
+    row.classList.toggle('match',stage>=3 && match);
+  }
+
+  if (stage===0) {
+    groupText(tile,'View 1',94,31);
+    groupText(tile,'View 2',362,31);
+    for (const [i,g] of candidates.entries()) {
+      const y = 58+40*i;
+      groupText(tile,g.name,40,y+12);
+      g.scores.forEach((score,v) => {
+        const x = 94+268*v;
+        tile.fillStyle = '#edf1e7';
+        tile.fillRect(x,y,200,12);
+        tile.fillStyle = g.view===v+1 ? teal : '#bdc8b9';
+        tile.fillRect(x,y,200*score,12);
+      });
+    }
+  } else if (stage===1 || stage===2) {
+    drawCameraAndTiles(stage,motion);
+  } else if (stage===3) {
+    shiftBins.forEach((bin,i) => {
+      const y = 70+104*i;
+      tile.fillStyle = bin===anchor.bin ? '#eaf4e7' : '#f7f2ed';
+      tile.fillRect(28,y-34,584,75);
+      groupText(tile,groupLabel(bin),45,y+11);
+      anchorTile.filter(g => g.bin===bin).forEach((g,j) => {
+        const x = 217+j*155;
+        drawGaussian(tile,x,y,13,bin===anchor.bin ? teal : rust);
+        groupText(tile,g.name+'  '+g.shift.toFixed(1)+' px',x+19,y+8);
+      });
+    });
+  } else {
+    const split = (progress-85)/15;
+    groupText(tile,'Group A + B',32,52,teal);
+    groupText(tile,(split>0 ? '3' : '2')+' / 3 Gaussians',374,52,teal);
+    drawLine(tile,32,69,602,69,'#dce6cf');
+    groupText(tile,'1   A',36,125);
+    groupText(tile,'2   B',36,193);
+    drawGaussian(tile,173-20*split,118+5*split,21-6*split,teal);
+    if (split>0) drawGaussian(tile,173+20*split,118-5*split,21-6*split,teal);
+    drawGaussian(tile,173,186,21,teal);
+    groupText(tile,split>0 ? 'Split into two children' : 'First split candidate',243,125);
+    groupText(tile,split>0 ? 'Kept intact' : 'Next split candidate',243,193);
+  }
+}
+
+const groupPlayback = sliderPlayback(groupProgress,'group-play',100,100,position => {
+  cancelAnimationFrame(cameraMotionFrame);
+  groupProgress.value = Math.floor(position);
+  drawGroupExample();
+});
+
+document.getElementById('group-play').addEventListener('click',() => cancelAnimationFrame(cameraMotionFrame));
+
+function playCameraShift() {
+  groupPlayback.seek(40);
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1,(now-start)/2200);
+    const motion = t*t*(3-2*t);
+    groupPlayback.seek(40+25*motion);
+    drawCameraAndTiles(2,motion);
+    if (t<1) cameraMotionFrame = requestAnimationFrame(tick);
+  }
+  cameraMotionFrame = requestAnimationFrame(tick);
+}
+
+for (const button of groupButtons) {
+  button.addEventListener('click', () => {
+    cancelAnimationFrame(cameraMotionFrame);
+    if (button.value==='65' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      playCameraShift();
+      return;
+    }
+    groupPlayback.seek(Number(button.value));
+  });
+}
+groupProgress.addEventListener('input', () => groupPlayback.seek(Number(groupProgress.value)));
+document.fonts.ready.then(drawGroupExample);
+drawGroupExample();
+
+const sectionLinks = [...document.querySelectorAll('nav a')];
+function markCurrentSection() {
+  const active = sectionLinks.filter(link =>
+    document.querySelector(link.hash).getBoundingClientRect().top <= innerHeight*.35).pop();
+  for (const link of sectionLinks) {
+    if (link === active) link.setAttribute('aria-current','location');
+    else link.removeAttribute('aria-current');
+  }
+}
+window.addEventListener('scroll', markCurrentSection, {passive:true});
+markCurrentSection();
+
+function setupComparisons() {
+  const root = document.getElementById('comparisons');
+  const player = document.getElementById('comparison-video');
+  const choices = document.getElementById('comparison-views');
+  const method = document.getElementById('comparison-method');
+  const play = document.getElementById('comparison-play');
+  const seek = document.getElementById('comparison-seek');
+  const time = document.getElementById('comparison-time');
+  const inspect = document.getElementById('comparison-still');
+  const sourceFrame = new Image();
+  const clocks = [...root.querySelectorAll('.recon-time')];
+  const elapsedTime = document.getElementById('comparison-elapsed');
+  const clockFace = root.querySelector('.clock-face');
+  const clockSpeed = document.getElementById('comparison-speed');
+  clockSpeed.textContent = reconstructionClockSpeed+'×';
+  let introDuration = 0;
+  let finishSeconds = [];
+  let introElapsed = 0;
+  let introFrame = 0;
+  let remainingClips = comparisonClips.length;
+  let inspecting = false;
+  let playWhenReady = false;
+  const outputs = [...root.querySelectorAll('canvas')].map(canvas => canvas.getContext('2d'));
+  let clip;
+  let scheduledFrame;
+
+  function timestamp(seconds) {
+    const whole = Math.floor(seconds);
+    return Math.floor(whole/60)+':'+String(whole%60).padStart(2,'0');
+  }
+
+  function paint(mediaTime = player.currentTime) {
+    if (player.readyState < 2 || !Number.isFinite(player.duration)) return;
+    const source = inspecting && sourceFrame.complete && sourceFrame.naturalWidth ? sourceFrame : player;
+    for (const [i, ctx] of outputs.entries()) {
+      const cell = i===0 ? 0 : Number(method.value);
+      const x = (cell%clip.columns)*clip.width;
+      const y = Math.floor(cell/clip.columns)*clip.height;
+      ctx.drawImage(source,x,y,clip.width,clip.height,0,0,clip.width,clip.height);
+    }
+    seek.value = Math.round(mediaTime*clip.fps);
+    time.value = timestamp(mediaTime)+' / '+timestamp(player.duration);
+  }
+
+  function tick() {
+    paint();
+    if (!player.paused && !player.ended) scheduledFrame = requestAnimationFrame(tick);
+  }
+
+  function closeInspection() {
+    inspecting = false;
+    inspect.setAttribute('aria-pressed','false');
+  }
+
+  function updateDuration() {
+    const values = [clip.minutes[0], clip.minutes[Number(method.value)]];
+    finishSeconds = values.map(value => Math.round(Number(value.replace('<',''))*60));
+    introDuration = Math.max(...finishSeconds)*1000/reconstructionClockSpeed;
+  }
+
+  function drawClocks(inIntro = false) {
+    const values = [clip.minutes[0], clip.minutes[Number(method.value)]];
+    const totalSeconds = Math.max(...finishSeconds);
+    const elapsedSeconds = Math.min(totalSeconds,introElapsed*reconstructionClockSpeed/1000);
+    elapsedTime.textContent = timestamp(elapsedSeconds);
+    clockFace.style.setProperty('--seconds',elapsedSeconds*6+'deg');
+    clockFace.style.setProperty('--minutes',elapsedSeconds/10+'deg');
+    clocks.forEach((clock,i) => {
+      const running = inIntro && elapsedSeconds < finishSeconds[i];
+      clock.lastElementChild.textContent = running ? timestamp(elapsedSeconds)+' / '+values[i]+' min' : values[i]+' min';
+      clock.style.setProperty('--hand', Math.min(elapsedSeconds,finishSeconds[i])*6+'deg');
+      clock.closest('figure').classList.toggle('reconstructing',running);
+    });
+  }
+
+  function pauseComparison() {
+    cancelAnimationFrame(introFrame);
+    introFrame = 0;
+    playWhenReady = false;
+    player.pause();
+    play.textContent = 'Play';
+  }
+
+  function startComparison() {
+    film.pause();
+    document.getElementById('cpi-clip').pause();
+    closeInspection();
+    const start = performance.now()-introElapsed;
+    function advance(now) {
+      introElapsed = Math.min(introDuration,now-start);
+      drawClocks(introElapsed<introDuration);
+      if (introElapsed<introDuration) {
+        play.textContent = 'Pause';
+        introFrame = requestAnimationFrame(advance);
+      } else {
+        introFrame = 0;
+        player.play().catch(() => { play.textContent = 'Play'; });
+      }
+    }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) advance(start+introDuration);
+    else advance(performance.now());
+  }
+
+  function choose(next, continuePlayback = false) {
+    pauseComparison();
+    introElapsed = 0;
+    playWhenReady = continuePlayback;
+    if (!continuePlayback) remainingClips = comparisonClips.length;
+    const lastMethod = method.selectedOptions[0]?.textContent ?? "VGGT-X · arXiv'25";
+    closeInspection();
+    clip = next;
+    for (const button of choices.children) {
+      button.setAttribute('aria-pressed',String(Number(button.value)===clip.views));
+    }
+    method.replaceChildren(...clip.methods.slice(1).map((name,i) => new Option(name,String(i+1))));
+    const previous = [...method.options].find(option => option.textContent===lastMethod);
+    if (previous) method.value = previous.value;
+    updateDuration();
+    document.getElementById('comparison-baseline-label').textContent = method.selectedOptions[0].textContent;
+    document.getElementById('comparison-scene').textContent = clip.dataset+' / '+clip.scene+' / '+clip.views+' input views';
+    drawClocks();
+    for (const ctx of outputs) {
+      ctx.canvas.width = clip.width;
+      ctx.canvas.height = clip.height;
+    }
+    play.textContent = 'Play';
+    play.disabled = seek.disabled = inspect.disabled = true;
+    seek.value = 0;
+    time.value = '';
+    const assets = document.getElementById('comparison-'+clip.views).content;
+    sourceFrame.removeAttribute('src');
+    player.src = assets.querySelector('source').getAttribute('src');
+  }
+
+  for (const entry of comparisonClips) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = entry.views+' views';
+    button.value = entry.views;
+    button.addEventListener('click',() => { if (entry!==clip) choose(entry); });
+    choices.append(button);
+  }
+  player.addEventListener('loadeddata',() => {
+    seek.max = Math.round(player.duration*clip.fps)-1;
+    play.disabled = seek.disabled = inspect.disabled = false;
+    paint();
+    if (playWhenReady) {
+      playWhenReady = false;
+      startComparison();
+    }
+  });
+  player.addEventListener('seeked',() => paint());
+  sourceFrame.addEventListener('load',() => { if (inspecting) paint(5); });
+  inspect.addEventListener('click',() => {
+    if (inspecting) {
+      closeInspection();
+    } else {
+      pauseComparison();
+      introElapsed = introDuration;
+      drawClocks();
+      inspecting = true;
+      inspect.setAttribute('aria-pressed','true');
+      if (!sourceFrame.hasAttribute('src')) {
+        const image = document.getElementById('comparison-'+clip.views).content.querySelector('img');
+        sourceFrame.src = image.getAttribute('src');
+      }
+      player.currentTime = 5;
+    }
+    paint();
+  });
+  player.addEventListener('play',() => {
+    closeInspection();
+    play.textContent = 'Pause';
+    film.pause();
+    document.getElementById('cpi-clip').pause();
+    cancelAnimationFrame(scheduledFrame);
+    tick();
+  });
+  player.addEventListener('pause',() => {
+    cancelAnimationFrame(scheduledFrame);
+    play.textContent = 'Play';
+  });
+  player.addEventListener('ended',() => {
+    const next = comparisonClips[(comparisonClips.indexOf(clip)+1)%comparisonClips.length];
+    if (--remainingClips>0) choose(next,true);
+    else { paint(); play.textContent = 'Replay'; }
+  });
+  player.addEventListener('error',() => { time.value = 'Video unavailable'; });
+  for (const other of [film,document.getElementById('cpi-clip')]) {
+    other.addEventListener('play',pauseComparison);
+  }
+  play.addEventListener('click',() => {
+    if (introFrame || !player.paused) return pauseComparison();
+    if (player.ended) {
+      player.currentTime = 0;
+      introElapsed = 0;
+      remainingClips = comparisonClips.length;
+    }
+    startComparison();
+  });
+  seek.addEventListener('input',() => {
+    pauseComparison();
+    introElapsed = Number(seek.value)===0 ? 0 : introDuration;
+    drawClocks();
+    closeInspection();
+    player.currentTime = (Number(seek.value)+0.25)/clip.fps;
+  });
+  method.addEventListener('change',() => {
+    const finished = introElapsed>=introDuration;
+    updateDuration();
+    introElapsed = finished ? introDuration : Math.min(introElapsed,introDuration);
+    document.getElementById('comparison-baseline-label').textContent = method.selectedOptions[0].textContent;
+    drawClocks(introElapsed>0 && introElapsed<introDuration);
+    paint();
+  });
+  choose(comparisonClips.find(entry => entry.views===192));
+}
+setupComparisons();
+</script></body></html>
