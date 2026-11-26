@@ -1,0 +1,48 @@
+# macOS / editor metadata
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Build outputs of compiled extensions
+build/
+dist/
+*.so
+
+# Data, checkpoints and outputs
+data/
+output/
+outputs/
+*.ckpt
+*.pth
+
+# Logs
+*.log
+
+# Editor / patch leftovers
+*.bak
+*.orig
+*.tmp
+*.rej
+
+# Secrets
+.env
+.env.local
+*.pem
+*.key
