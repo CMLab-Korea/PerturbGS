@@ -4,7 +4,7 @@
 </h1>
 
 **<a href="https://github.com/sh25youn2">Seokhyun Youn</a>**<sup>1</sup>,
-**<a href="mailto:weeyoungkwon@cau.ac.kr">Weeyoung Kwon</a>**<sup>1</sup>,
+**<a href="https://github.com/klavna">Weeyoung Kwon</a>**<sup>1</sup>,
 **<a href="https://www.junhokim-xyz.com/">Junho Kim</a>**<sup>2</sup>,
 **<a href="https://github.com/JihyongOh">Jihyong Oh</a>**<sup>1†</sup>
 <br>
